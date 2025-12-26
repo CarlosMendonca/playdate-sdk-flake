@@ -111,9 +111,10 @@ in
       runHook postInstall
     '';
     meta = with lib; {
-      description = "the Panic Playdate game console SDK, contains the simulator PlaydateSimulator, the compiler pdc, and the util program pdutil.";
+      description = "The Panic Playdate game console SDK, contains the simulator PlaydateSimulator, the compiler pdc, and the util program pdutil";
       homepage = "https://play.date/dev/";
-      licenses = lib.licenses.unfree;
-
+      license = licenses.unfree;
+      platforms = [ "x86_64-linux" ];
+      maintainers = [ ];
     };
   }

@@ -1,5 +1,7 @@
  {
-  inputs = {};
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+  };
   outputs = {self, nixpkgs, ...}:
     let system = "x86_64-linux";
         pkgs = nixpkgs.legacyPackages.${system};
@@ -15,6 +17,9 @@
           export PLAYDATE_SDK_PATH=".PlaydateSDK"
           export SDL_AUDIODRIVER=pulseaudio
         '';
+      };
+      overlays.default = final: prev: {
+        playdate-sdk = final.callPackage ./playdate-sdk.nix {};
       };
   };
 }
