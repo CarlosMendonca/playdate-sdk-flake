@@ -29,9 +29,6 @@
   ];
 
   dynamicLinker = "${pkgs.glibc}/lib/ld-linux-x86-64.so.2";
-
-  pdwrapper = {program}: ''
-  '';
 in
   stdenv.mkDerivation rec {
     pname = "playdate-sdk";
@@ -82,7 +79,7 @@ in
       if [ ! -d ".PlaydateSDK" ]; then
         read -p "pdwrapper> .PlaydateSDK not found. Create it in (\`pwd\`)? [y/n]" -n 1 -r
         echo
-        if [[ ! \$REPLY =~ ^[Yy]$ ]] then
+        if [[ ! \$REPLY =~ ^[Yy]$ ]]; then
           echo "pdwrapper> cancelled."
           exit
         fi
