@@ -68,9 +68,9 @@ in
       # Binaries
       mkdir -p $out/bin
 
-      cp $root/bin/pdc $out/bin/pdc
-      cp $root/bin/pdutil $out/bin/pdutil
-      cp $root/bin/PlaydateSimulator $out/bin/PlaydateSimulator
+      ln -s $root/bin/pdc $out/bin/pdc
+      ln -s $root/bin/pdutil $out/bin/pdutil
+      ln -s $root/bin/PlaydateSimulator $out/bin/PlaydateSimulator
 
       # NixOS really hates writable install paths. Lets fake one
 
