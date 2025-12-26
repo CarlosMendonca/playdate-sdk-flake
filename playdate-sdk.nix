@@ -42,7 +42,7 @@ in
     };
 
     buildInputs = pdcInputs;
-    nativeBuildInputs = [ pkgs.makeWrapper pkgs.wrapGAppsHook ];
+    nativeBuildInputs = [ pkgs.makeWrapper pkgs.wrapGAppsHook3 ];
     dontFixup = true;
 
     installPhase = ''
