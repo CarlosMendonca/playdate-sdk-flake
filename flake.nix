@@ -21,5 +21,22 @@
       overlays.default = final: prev: {
         playdate-sdk = final.callPackage ./playdate-sdk.nix {};
       };
+      checks.${system}.default = pkgs.runCommand "playdate-sdk-check" {
+        buildInputs = [ playdate-sdk ];
+      } ''
+        # Test that pdc --version returns the expected version
+        version_output=$(pdc --version 2>&1)
+        expected_version="${playdate-sdk.version}"
+
+        if echo "$version_output" | grep -q "$expected_version"; then
+          echo "✓ pdc version check passed: $version_output"
+          touch $out
+        else
+          echo "✗ pdc version check failed"
+          echo "Expected: $expected_version"
+          echo "Got: $version_output"
+          exit 1
+        fi
+      '';
   };
 }
