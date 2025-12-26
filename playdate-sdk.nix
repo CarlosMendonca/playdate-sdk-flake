@@ -38,7 +38,7 @@ in
     version = "3.0.2";
     src = pkgs.fetchurl {
       url = "https://download.panic.com/playdate_sdk/Linux/PlaydateSDK-${version}.tar.gz";
-      sha256 = "sha256-RhvN8aXXjJUZ4TEgm/sbLqmDFvZAPW9HNhQwhvBqnV8=";
+      sha256 = "sha256-+vVnPgofsCwCcvPh/dfoBp2boC5L7083rehOVHSq+o0="
     };
 
     buildInputs = pdcInputs;
