@@ -43,7 +43,6 @@ in
 
     buildInputs = pdcInputs;
     nativeBuildInputs = [ pkgs.makeWrapper pkgs.wrapGAppsHook3 ];
-    dontFixup = true;
 
     installPhase = ''
       runHook preInstall
