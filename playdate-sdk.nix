@@ -44,35 +44,23 @@ in
     installPhase = ''
       runHook preInstall
 
-      # Get our new root
-      root=$out/opt/playdate-sdk-${version}
+      # Install everything unpacked to the temporary build directory directly to $out
+      cp -r ./ $out/
 
-      # Everything else
-      mkdir -p $out/opt/playdate-sdk-${version}
-      cp -r ./ $out/opt/playdate-sdk-${version}
-      ln -s $root $out/opt/playdate-sdk
-
-      # Setup dependencies and interpreter
+      # Patch binaries
       patchelf \
         --set-interpreter "${dynamicLinker}" \
         --set-rpath "${lib.makeLibraryPath pdcInputs}" \
-        $root/bin/pdc
+        $out/bin/pdc
       patchelf \
         --set-interpreter "${dynamicLinker}" \
-        $root/bin/pdutil
+        $out/bin/pdutil
       patchelf \
         --set-interpreter "${dynamicLinker}" \
         --set-rpath "${lib.makeLibraryPath pdsInputs}"\
-        $root/bin/PlaydateSimulator
+        $out/bin/PlaydateSimulator
 
-      # Binaries
-      mkdir -p $out/bin
-
-      ln -s $root/bin/pdc $out/bin/pdc
-      ln -s $root/bin/pdutil $out/bin/pdutil
-      ln -s $root/bin/PlaydateSimulator $out/bin/PlaydateSimulator
-
-      # NixOS really hates writable install paths. Lets fake one
+      # NixOS really hates writable install paths, so lets fake one by creating a script that creates a sandboxed environment
 
       cat > $out/bin/pdwrapper <<EOL
       #!/usr/bin/env bash
@@ -80,29 +68,23 @@ in
         read -p "pdwrapper> .PlaydateSDK not found. Create it in (\`pwd\`)? [y/n]" -n 1 -r
         echo
         if [[ ! \$REPLY =~ ^[Yy]$ ]]; then
-          echo "pdwrapper> cancelled."
+          echo "pdwrapper> Cancelled"
           exit
         fi
         echo "pdwrapper> Creating .PlaydateSDK"
         mkdir .PlaydateSDK
         cp -TR $out/Disk .PlaydateSDK/Disk
         chmod -R 755 .PlaydateSDK/Disk
-        cp -TR $out/bin .PlaydateSDK/bin
+        ln -s $out/bin .PlaydateSDK/bin
         ln -s $out/C_API .PlaydateSDK/C_API
         ln -s $out/CoreLibs .PlaydateSDK/CoreLibs
         ln -s $out/Resources .PlaydateSDK/Resources
       fi
       echo "pdwrapper> Running .PlaydateSDK/bin/PlaydateSimulator";
-      export XDG_DATA_DIRS=$gsettings_schemas_path/share/gsettings-schemas/$gsettings_schemas_name:$gtk_path/share/gsettings-schemas/$gtk_name:$XDG_DATA_DIRS
 
       PLAYDATE_SDK_PATH=.PlaydateSDK exec -a \`pwd\`.PlaydateSDK/bin/PlaydateSimulator .PlaydateSDK/bin/PlaydateSimulator $@
       EOL
       chmod 555 $out/bin/pdwrapper
-
-      cp -r $root/C_API $out/C_API
-      cp -r $root/CoreLibs $out/CoreLibs
-      cp -r $root/Resources $out/Resources
-      cp -r $root/Disk $out/Disk
 
       runHook postInstall
     '';
