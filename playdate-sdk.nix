@@ -111,6 +111,7 @@ in
       homepage = "https://play.date/dev/";
       license = licenses.unfree;
       platforms = [ "x86_64-linux" ];
+      sourceProvenance = [ sourceTypes.binaryNativeCode ];
       maintainers = [
         "RegularTetragon"
         "redpenguinyt"
