@@ -13,9 +13,8 @@
       devShells.${system}.default = pkgs.mkShell {
         packages = [playdate-sdk];
         shellHook = ''
-          export PLAYDATE_SDK_PATH="${playdate-sdk}"
           export SDL_AUDIODRIVER=pulseaudio
-          echo "PlaydateSimulator ready. Run 'pdwrapper' if you need writable storage."
+          export PLAYDATE_SDK_PATH=.PlaydateSDK
         '';
       };
       overlays.default = final: prev: {

@@ -11,7 +11,7 @@
   ];
 
   # Build inputs for the simulator (excluding those from pdc)
-  pdsInputs = with pkgs; [
+  playdateSimulatorInputs = with pkgs; [
     udev
     gtk3
     pango
@@ -38,7 +38,7 @@ in
       sha256 = "sha256-+vVnPgofsCwCcvPh/dfoBp2boC5L7083rehOVHSq+o0=";
     };
 
-    buildInputs = pdcInputs;
+    buildInputs = playdateSimulatorInputs;
     nativeBuildInputs = [ pkgs.makeWrapper pkgs.wrapGAppsHook3 ];
 
     installPhase = ''
@@ -57,37 +57,28 @@ in
         $out/bin/pdutil
       patchelf \
         --set-interpreter "${dynamicLinker}" \
-        --set-rpath "${lib.makeLibraryPath pdsInputs}"\
+        --set-rpath "${lib.makeLibraryPath playdateSimulatorInputs}"\
         $out/bin/PlaydateSimulator
 
-      # NixOS really hates writable install paths, so lets fake one by creating a script that creates a sandboxed environment
-
-      cat > $out/bin/pdwrapper <<EOL
-      #!/usr/bin/env bash
-      if [ ! -d ".PlaydateSDK" ]; then
-        read -p "pdwrapper> .PlaydateSDK not found. Create it in (\`pwd\`)? [y/n]" -n 1 -r
-        echo
-        if [[ ! \$REPLY =~ ^[Yy]$ ]]; then
-          echo "pdwrapper> Cancelled"
-          exit
-        fi
-        echo "pdwrapper> Creating .PlaydateSDK"
-        mkdir .PlaydateSDK
-        cp -TR $out/Disk .PlaydateSDK/Disk
-        chmod -R 755 .PlaydateSDK/Disk
-        ln -s $out/bin .PlaydateSDK/bin
-        ln -s $out/C_API .PlaydateSDK/C_API
-        ln -s $out/CoreLibs .PlaydateSDK/CoreLibs
-        ln -s $out/Resources .PlaydateSDK/Resources
-      fi
-      echo "pdwrapper> Running .PlaydateSDK/bin/PlaydateSimulator";
-
-      PLAYDATE_SDK_PATH=.PlaydateSDK exec -a \`pwd\`.PlaydateSDK/bin/PlaydateSimulator .PlaydateSDK/bin/PlaydateSimulator $@
-      EOL
-      chmod 555 $out/bin/pdwrapper
+      # Install sandbox setup script
+      mkdir -p $out/libexec
+      cp ${./playdate-sandbox-setup.sh} $out/libexec/playdate-sandbox-setup.sh
+      substituteInPlace $out/libexec/playdate-sandbox-setup.sh \
+        --replace-fail '@PLAYDATE_SDK@' "$out"
+      chmod +x $out/libexec/playdate-sandbox-setup.sh
 
       runHook postInstall
     '';
+
+    dontWrapGApps = true;
+
+    postFixup = ''
+      mv $out/bin/PlaydateSimulator $out/bin/.PlaydateSimulator-unwrapped
+      makeShellWrapper $out/bin/.PlaydateSimulator-unwrapped $out/bin/PlaydateSimulator \
+        "''${gappsWrapperArgs[@]}" \
+        --run ". $out/libexec/playdate-sandbox-setup.sh"
+    '';
+
     meta = with lib; {
       description = "The Panic Playdate game console SDK, contains the simulator PlaydateSimulator, the compiler pdc, and the util program pdutil";
       homepage = "https://play.date/dev/";
