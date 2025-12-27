@@ -32,10 +32,11 @@
 in
   stdenv.mkDerivation rec {
     pname = "playdate-sdk";
-    version = "3.0.2";
+    version = "3.0.0";
     src = pkgs.fetchurl {
       url = "https://download.panic.com/playdate_sdk/Linux/PlaydateSDK-${version}.tar.gz";
-      sha256 = "sha256-+vVnPgofsCwCcvPh/dfoBp2boC5L7083rehOVHSq+o0=";
+      sha256 = "sha256-1VDoFt9hsc/bT9ZAzliTUioY5BEr+18Dut0P6FzF5+0="; # 3.0.0
+      # sha256 = "sha256-+vVnPgofsCwCcvPh/dfoBp2boC5L7083rehOVHSq+o0="; # 3.0.2
     };
 
     buildInputs = playdateSimulatorInputs;
