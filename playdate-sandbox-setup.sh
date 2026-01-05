@@ -22,6 +22,7 @@ if [ ! -d "$SANDBOX_DIR" ]; then
   ln -s @PLAYDATE_SDK@/bin "$SANDBOX_DIR/bin"
   ln -s @PLAYDATE_SDK@/C_API "$SANDBOX_DIR/C_API"
   ln -s @PLAYDATE_SDK@/CoreLibs "$SANDBOX_DIR/CoreLibs"
+  ln -s @PLAYDATE_SDK@/Examples "$SANDBOX_DIR/Examples"
   ln -s @PLAYDATE_SDK@/Resources "$SANDBOX_DIR/Resources"
 fi
 
